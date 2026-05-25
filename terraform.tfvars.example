@@ -1,0 +1,4 @@
+raiz_cidr_block    = "10.0.0.0/16"
+raiz_environment   = "AUY1105-duocapp"
+raiz_ami_id        = "ami-0fa8aad99729521be"
+raiz_instance_type = "t2.micro"
