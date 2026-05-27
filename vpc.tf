@@ -1,6 +1,6 @@
 resource "aws_vpc" "mi_vpc" {
   # CAMBIO: Ajustado a 10.0.0.0/16 para que coincida con tus subnets
-  cidr_block           = "10.0.0.0/16" 
+  cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
@@ -20,13 +20,13 @@ resource "aws_default_security_group" "default" {
 
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
   name              = "/aws/vpc/flow-logs-duocapp-v2" # Agregamos -v2
-  retention_in_days = 7 
+  retention_in_days = 7
 }
 
 # Si decides usarlo, debes usar el ARN del "LabRole" que ya existe
 resource "aws_flow_log" "mi_vpc_flow_log" {
   # CAMBIO: Usamos el rol pre-existente del laboratorio
-  iam_role_arn    = "arn:aws:iam::767397756296:role/LabRole" 
+  iam_role_arn    = "arn:aws:iam::767397756296:role/LabRole"
   log_destination = aws_cloudwatch_log_group.vpc_log_group.arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.mi_vpc.id
@@ -37,7 +37,7 @@ resource "aws_flow_log" "mi_vpc_flow_log" {
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.mi_vpc.id
-  tags = { Name = "AUY1105-duocapp-igw" }
+  tags   = { Name = "AUY1105-duocapp-igw" }
 }
 
 # Ahora estas subnets SÍ son válidas dentro de 10.0.0.0/16
@@ -46,7 +46,7 @@ resource "aws_subnet" "subnet_publica_1" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true # Cambiado a true para que las EC2 públicas tengan IP
-  tags = { Name = "AUY1105-duocapp-subnet-publica-1" }
+  tags                    = { Name = "AUY1105-duocapp-subnet-publica-1" }
 }
 
 resource "aws_subnet" "subnet_publica_2" {
@@ -54,7 +54,7 @@ resource "aws_subnet" "subnet_publica_2" {
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
-  tags = { Name = "AUY1105-duocapp-subnet-publica-2" }
+  tags                    = { Name = "AUY1105-duocapp-subnet-publica-2" }
 }
 
 resource "aws_subnet" "subnet_privada_1" {
