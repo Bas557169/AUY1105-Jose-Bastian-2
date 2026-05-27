@@ -30,7 +30,7 @@ jobs:
       - name: Install TFLint
         run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      # Formatea los archivos de la raíz. Quitamos -check para evitar bloqueos por espacios.
+      # Formatea los archivos de la raíz del repositorio de manera directa
       - name: Terraform Format
         run: terraform fmt -recursive
 
@@ -80,7 +80,7 @@ jobs:
           chmod +x opa
           sudo mv opa /usr/local/bin/
 
-      # Generamos el plan en la raíz
+      # Genera el plan en la raíz
       - name: Terraform Init & Plan JSON
         run: |
           terraform init -upgrade -input=false
@@ -91,7 +91,7 @@ jobs:
         run: |
           checkov -f tfplan.json --skip-check CKV_AWS_158,CKV_AWS_338,CKV_AWS_290,CKV_AWS_355,CKV_AWS_135,CKV_AWS_126,CKV_AWS_382,CKV_AWS_130,CKV2_AWS_11,CKV2_AWS_12,CKV2_AWS_41
 
-      # CORRECCIÓN: Como las políticas .rego están en la raíz, las llamamos directamente sin "../../"
+      # Evaluación directa de las políticas .rego en la raíz
       - name: OPA Policy Compliance Check
         run: |
           echo "--- 1. Validando Instancias y Seguridad (Analysis) ---"
