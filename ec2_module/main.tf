@@ -29,7 +29,7 @@ resource "aws_instance" "mi_ec2" {
   instance_type           = var.instance_type
   subnet_id               = var.subnet_id # Usando la variable inyectada
   vpc_security_group_ids  = [aws_security_group.ssh_access.id]
-  disable_api_termination = true
+  disable_api_termination = false
   monitoring              = true
   ebs_optimized           = true
 
