@@ -30,20 +30,20 @@ jobs:
       - name: Install TFLint
         run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      - name: Terraform Format
-        run: terraform fmt -recursive
-
+      # Formatea todo el repositorio de manera recursiva
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
-      - name: Terraform Init
-        run: terraform init -upgrade -input=false
-
-      - name: Terraform Validate
-        run: terraform validate
+      # Inicializa y valida parándose específicamente en la carpeta raíz de la práctica
+      - name: Terraform Init & Validate
+        run: |
+          cd EA2/ACT_Preparacion/
+          terraform init -upgrade -input=false
+          terraform validate
 
       - name: Run TFLint
         run: |
+          cd EA2/ACT_Preparacion/
           tflint --init
           tflint --recursive
 
@@ -70,6 +70,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Install Checkov
         run: pip3 install checkov
@@ -80,26 +82,31 @@ jobs:
           chmod +x opa
           sudo mv opa /usr/local/bin/
 
+      # Generamos el plan JSON dentro de la carpeta del laboratorio
       - name: Terraform Init & Plan JSON
         run: |
+          cd EA2/ACT_Preparacion/
           terraform init -upgrade -input=false
           terraform plan -out=tfplan -input=false
           terraform show -json tfplan > tfplan.json
 
       - name: Run Checkov
         run: |
+          cd EA2/ACT_Preparacion/
           checkov -f tfplan.json --skip-check CKV_AWS_158,CKV_AWS_338,CKV_AWS_290,CKV_AWS_355,CKV_AWS_135,CKV_AWS_126,CKV_AWS_382,CKV_AWS_130,CKV2_AWS_11,CKV2_AWS_12,CKV2_AWS_41
 
+      # CORRECCIÓN AQUÍ: Se apunta a los archivos .rego que están dos niveles arriba (raíz del repositorio)
       - name: OPA Policy Compliance Check
         run: |
+          cd EA2/ACT_Preparacion/
           echo "--- 1. Validando Instancias y Seguridad (Analysis) ---"
-          RESULT_ANALYSIS=$(opa eval -i tfplan.json -d instancias.rego "data.terraform.analysis.violation" --format json || echo "ERROR_OPA")
+          RESULT_ANALYSIS=$(opa eval -i tfplan.json -d ../../instancias.rego "data.terraform.analysis.violation" --format json || echo "ERROR_OPA")
           echo "Debug Analisis: $RESULT_ANALYSIS"
           if [[ "$RESULT_ANALYSIS" == "ERROR_OPA" ]]; then exit 1; fi
           echo "$RESULT_ANALYSIS" | tr -d '[:space:]' | grep -q '\[\]' || exit 1
 
           echo "--- 2. Validando Nombre y Autorización (Authz) ---"
-          RESULT_NAME=$(opa eval -i tfplan.json -d terraform_name_check.rego "data.terraform.authz.allow" --format json || echo "ERROR_OPA")
+          RESULT_NAME=$(opa eval -i tfplan.json -d ../../terraform_name_check.rego "data.terraform.authz.allow" --format json || echo "ERROR_OPA")
           echo "Debug Name: $RESULT_NAME"
           if [[ "$RESULT_NAME" == "ERROR_OPA" ]]; then exit 1; fi
           echo "$RESULT_NAME" | grep -q '"status":[[:space:]]*true' || exit 1
@@ -108,7 +115,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: tfplan
+          path: EA2/ACT_Preparacion/tfplan
 
   deploy:
     name: "Terraform Apply"
@@ -129,23 +136,26 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Download Plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-
-      - name: Terraform Init
-        run: terraform init -upgrade -input=false
+          path: EA2/ACT_Preparacion/
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: |
+          cd EA2/ACT_Preparacion/
+          terraform init -upgrade -input=false
+          terraform apply -auto-approve tfplan
 
       - name: Upload State
         uses: actions/upload-artifact@v4
         with:
           name: terraform-state
-          path: terraform.tfstate
+          path: EA2/ACT_Preparacion/terraform.tfstate
 
   destroy:
     name: "Terraform Destroy"
@@ -169,12 +179,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: terraform-state
+          path: EA2/ACT_Preparacion/
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform init -upgrade -input=false
+        with:
+          terraform_wrapper: false
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: |
+          cd EA2/ACT_Preparacion/
+          terraform init -upgrade -input=false
+          terraform destroy -auto-approve
