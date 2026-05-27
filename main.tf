@@ -12,15 +12,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Instancia del Módulo de Redes
-module "vpc" {
-  source = "./vpc_module"
 
-  cidr_block       = var.raiz_cidr_block
-  environment_name = var.raiz_environment
-}
-
-# Instancia del Módulo de Cómputo
 module "ec2" {
   source = "./ec2_module"
 
