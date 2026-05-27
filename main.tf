@@ -14,7 +14,7 @@ module "vpc" {
 } 
 
 module "ec2" { 
-  source = "github.com/Bas557169/AUY1105-Jose-Bastian-2//ec2_module?ref=ec2" 
+  source = "github.com/Bas557169/AUY1105-Jose-Bastian-2//ec2_module?ref=EC22" 
 
   vpc_id        = module.vpc.vpc_id 
    
