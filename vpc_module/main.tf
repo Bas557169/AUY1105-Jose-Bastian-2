@@ -38,7 +38,13 @@ resource "aws_flow_log" "mi_vpc_flow_log" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.mi_vpc.id
   tags   = { Name = "AUY1105-duocapp-igw" }
+
+  depends_on = [
+    aws_nat_gateway.nat_gw,
+    aws_eip.nat_eip
+  ]
 }
+
 
 # Ahora estas subnets SÍ son válidas dentro de 10.0.0.0/16
 resource "aws_subnet" "subnet_publica_1" {
