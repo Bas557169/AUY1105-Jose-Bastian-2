@@ -1,9 +1,3 @@
-variable "raiz_cidr_block" {
-  type        = string
-  description = "Rango de IPs que se enviará al módulo VPC de GitHub"
-  default     = "10.0.0.0/16"
-}
-
 variable "raiz_environment" {
   type        = string
   description = "Nombre del entorno para tagear la infraestructura remota"
