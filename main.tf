@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">= 1.0.0"
+  
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 module "vpc" {
   # Aseguramos que el tag coincida exactamente con el de GitHub (minúsculas si así lo creaste)
   source = "github.com/Bas557169/AUY1105-Jose-Bastian-2//vpc_module?ref=vpc"
