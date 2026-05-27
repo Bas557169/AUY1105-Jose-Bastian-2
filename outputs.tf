@@ -6,7 +6,8 @@ output "raiz_vpc_id" {
 }
 
 output "raiz_subnet_publica_id" {
-  value       = module.vpc.subnet_publica_1_id
+  # CORRECCIÓN: Accedemos a la lista publica y tomamos el primer elemento [0]
+  value       = module.vpc.public_subnet_ids[0]
   description = "El ID de la subnet pública donde se aloja la infraestructura de cómputo"
 }
 
